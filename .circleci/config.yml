@@ -47,7 +47,7 @@ jobs:
 
   create-eks-cluster:
       docker:
-        - image: python:3.7-alpine3.11
+        - image: circleci/python:3.7.3-stretch
       working_directory: ~/project
       steps:
         - checkout
@@ -56,9 +56,40 @@ jobs:
             command: |
               apk add --update tar gzip curl
               curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.83.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
-              mv /tmp/eksctl /usr/local/bin
-              eksctl create cluster --name=cluster-${CIRCLE_WORKFLOW_ID:0:7}
-
+              sudo mv /tmp/eksctl /usr/local/bin
+              eksctl create cluster --name cluster-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-1 --nodegroup-name ng-1 --node-type t2.micro --nodes 2
+  deploy-eks-cluster:
+      docker: 
+        - image: circleci/python:3.7.3-stretch
+          user: root
+      working_directory: ~/project
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run:
+            name: install kubectl and deploy application to cluster
+            command: |
+              # install some packages
+              sudo apt-get -y install tar gzip unzip curl
+              sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              sudo unzip awscliv2.zip
+              sudo ./aws/install
+              echo "installed awscli"
+              # install kubectl
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+              kubectl version --client
+              echo "installed kubect"
+              # deploy cluster
+              aws eks update-kubeconfig --name cluster-${CIRCLE_WORKFLOW_ID:0:7}
+              docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME
+              echo "pulled docker image and updated k8s config"
+              # deploy application to k8s cluster
+              kubectl apply -f k8s/
+              echo "deployed application to k8s cluster"
+              kubectl -n default get all -A
+              echo "DONE"
 workflows:
   default:
     jobs:
@@ -67,3 +98,5 @@ workflows:
           requires: [build]
       - create-eks-cluster:
           requires: [push]
+      - deploy-eks-cluster:
+          requires: [create-eks-cluster]

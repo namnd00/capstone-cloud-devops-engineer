@@ -56,7 +56,7 @@ jobs:
             command: |
               apk add --update tar gzip curl
               curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.83.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
-              sudo mv /tmp/eksctl /usr/local/bin
+              mv /tmp/eksctl /usr/local/bin
               eksctl create cluster --name cluster-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-1 --nodegroup-name ng-1 --node-type t2.micro --nodes 2
   deploy-eks-cluster:
       docker: 

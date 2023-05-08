@@ -24,6 +24,10 @@ For deploying the Kubernetes Cluster, I employed AWS CloudFormation, which invol
 ### 3. Deployed Application:
 ![Deployments](./screenshots/k8s.png)
 
+Can you access to public ELB DNS:
+http://abe0d7ed7d3cf4b1fbe5ad345c9387c8-1846472379.us-east-1.elb.amazonaws.com/
+![ELB DNS](./screenshots/elb.png)
+
 ## CircleCi - CI/CD Pipelines
 
 To facilitate the testing and deployment process, I utilized CircleCI to construct a CI/CD Pipeline. This pipeline allows for manual testing and deployment of changes, ensuring that they are thoroughly evaluated before being automatically deployed to the Cluster via cloudformation.

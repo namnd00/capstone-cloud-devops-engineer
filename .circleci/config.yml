@@ -45,9 +45,25 @@ jobs:
             docker tag $IMAGE_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME
 
+  create-eks-cluster:
+      docker:
+        - image: python:3.7-alpine3.11
+      working_directory: ~/project
+      steps:
+        - checkout
+        - run:
+            name: install eks and create EKS cluster
+            command: |
+              apk add --update tar gzip curl
+              curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.83.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+              mv /tmp/eksctl /usr/local/bin
+              eksctl create cluster --name=cluster-${CIRCLE_WORKFLOW_ID:0:7}
+
 workflows:
   default:
     jobs:
       - build
       - push:
           requires: [build]
+      - create-eks-cluster:
+          requires: [push]

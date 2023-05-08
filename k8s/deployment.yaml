@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: default
+  labels:
+    run: app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: app-deployment
+  template:
+    metadata:
+      labels:
+        run: app-deployment
+    spec:
+      containers:
+      - name: app-k8s-container
+        image: namnd00/app-k8s:latest
+        ports:
+        - name: http
+          containerPort: 80

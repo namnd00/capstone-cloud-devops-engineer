@@ -17,4 +17,21 @@ lint:
 	./hadolint Dockerfile
 	pylint --disable=R,C,W1203,W1202 app.py
 
+build:
+	source ./.env && \
+		docker build --tag=$(IMAGE_NAME) .
+
+run: build
+	source ./.env && \
+		docker run -p 8000:80 $(IMAGE_NAME)
+
+push: build
+	source ./.env
+	docker login -u="$(DOCKERHUB_USERNAME)" -p="$(DOCKERHUB_PASSWORD)"
+	docker tag $(IMAGE_NAME) $(DOCKERHUB_USERNAME)/$(IMAGE_NAME)
+	docker push $(DOCKERHUB_USERNAME)/$(IMAGE_NAME)
+
+deploy:
+	kubectl apply -f k8s/
+
 all: setup install lint test

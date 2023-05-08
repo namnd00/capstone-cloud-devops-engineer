@@ -88,8 +88,9 @@ jobs:
               # deploy application to k8s cluster
               kubectl apply -f k8s/
               echo "deployed application to k8s cluster"
-              kubectl -n default get all -A
-              echo "DONE"
+              kubectl -n default get all
+              ELB_IP=$(kubectl -n default get service app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+              echo "$ELB_IP"
 workflows:
   default:
     jobs:

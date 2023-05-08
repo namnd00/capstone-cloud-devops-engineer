@@ -19,17 +19,17 @@ lint:
 
 build:
 	source ./.env && \
-		docker build --tag=$(IMAGE_NAME) .
+		docker build --tag=$IMAGE_NAME .
 
 run: build
 	source ./.env && \
-		docker run -p 8000:80 $(IMAGE_NAME)
+		docker run -p 8000:80 $IMAGE_NAME
 
 push: build
 	source ./.env
-	docker login -u="$(DOCKERHUB_USERNAME)" -p="$(DOCKERHUB_PASSWORD)"
-	docker tag $(IMAGE_NAME) $(DOCKERHUB_USERNAME)/$(IMAGE_NAME)
-	docker push $(DOCKERHUB_USERNAME)/$(IMAGE_NAME)
+	docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+	docker tag $IMAGE_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME
+	docker push $DOCKERHUB_USERNAME/$IMAGE_NAME
 
 deploy:
 	kubectl apply -f k8s/

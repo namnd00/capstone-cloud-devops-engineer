@@ -38,4 +38,10 @@ To facilitate the testing and deployment process, I utilized CircleCI to constru
 
 Linting is employed to verify the syntactic correctness of both the Application and Dockerfile. This crucial process ensures that the code maintains a high level of quality at all times.
 
+- Linting steps successfully:
+
 ![Linting step successfully](./screenshots/lint.png)
+
+- Linting steps failed:
+
+![Linting step failed](./screenshots/lint-failed.png)
